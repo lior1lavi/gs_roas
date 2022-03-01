@@ -80,20 +80,20 @@ robyn_object <- "~/Desktop/MyRobyn.RDS"
 InputCollect <- robyn_inputs(
   dt_input = dt_simulated_weekly
   ,dt_holidays = dt_prophet_holidays
-  ,date_var = "DATE" # date format must be "2020-01-01"
+  ,date_var = "date" # date format must be "2020-01-01"
   ,dep_var = "revenue" # there should be only one dependent variable
   ,dep_var_type = "revenue" # "revenue" or "conversion"
   ,prophet_vars = c("trend", "season", "holiday") # "trend","season", "weekday" & "holiday"
   ,prophet_country = "DE"# input one country. dt_prophet_holidays includes 59 countries by default
-  ,context_vars = c("competitor_sales_B", "events") # e.g. competitors, discount, unemployment etc
-  ,paid_media_spends = c("tv_S","ooh_S",	"print_S"	,"facebook_S", "search_S") # mandatory input
-  ,paid_media_vars = c("tv_S", "ooh_S"	,	"print_S"	,"facebook_I" ,"search_clicks_P") # mandatory.
+  #,context_vars = c("competitor_sales_B", "events") # e.g. competitors, discount, unemployment etc
+  ,paid_media_spends = c("google_search_s","paid_facebook_s",	"paid_instagram_s") # mandatory input
+  ,paid_media_vars = c("google_search_l", "paid_facebook_l"	,	"paid_instagram_l") # mandatory.
   # paid_media_vars must have same order as paid_media_spends. Use media exposure metrics like
   # impressions, GRP etc. If not applicable, use spend instead.
-  ,organic_vars = c("newsletter") # marketing activity without media spend
-  ,factor_vars = c("events") # specify which variables in context_vars or organic_vars are factorial
-  ,window_start = "2016-11-23"
-  ,window_end = "2018-08-22"
+  #,organic_vars = c("newsletter") # marketing activity without media spend
+ # ,factor_vars = c("events") # specify which variables in context_vars or organic_vars are factorial
+  ,window_start = "2021-01-01"
+  ,window_end = "2022-02-28"
   ,adstock = "geometric" # geometric, weibull_cdf or weibull_pdf.
 )
 print(InputCollect)
@@ -165,29 +165,17 @@ plot_saturation(plot = FALSE)
 # Run hyper_limits() to check maximum upper and lower bounds by range
 # Example hyperparameters ranges for Geometric adstock
 hyperparameters <- list(
-  facebook_S_alphas = c(0.5, 3)
-  ,facebook_S_gammas = c(0.3, 1)
-  ,facebook_S_thetas = c(0, 0.3)
+   paid_facebook_s_alphas = c(0.5, 3)
+  ,paid_facebook_s_gammas = c(0.3, 1)
+  ,paid_facebook_s_thetas = c(0, 0.3)
 
-  ,print_S_alphas = c(0.5, 3)
-  ,print_S_gammas = c(0.3, 1)
-  ,print_S_thetas = c(0.1, 0.4)
+  ,google_search_s_alphas = c(0.5, 3)
+  ,google_search_s_gammas = c(0.3, 1)
+  ,google_search_s_thetas = c(0.1, 0.4)
 
-  ,tv_S_alphas = c(0.5, 3)
-  ,tv_S_gammas = c(0.3, 1)
-  ,tv_S_thetas = c(0.3, 0.8)
-
-  ,search_S_alphas = c(0.5, 3)
-  ,search_S_gammas = c(0.3, 1)
-  ,search_S_thetas = c(0, 0.3)
-
-  ,ooh_S_alphas = c(0.5, 3)
-  ,ooh_S_gammas = c(0.3, 1)
-  ,ooh_S_thetas = c(0.1, 0.4)
-
-  ,newsletter_alphas = c(0.5, 3)
-  ,newsletter_gammas = c(0.3, 1)
-  ,newsletter_thetas = c(0.1, 0.4)
+  ,paid_instagram_s_alphas = c(0.5, 3)
+  ,paid_instagram_s_gammas = c(0.3, 1)
+  ,paid_instagram_s_thetas = c(0.3, 0.8)
 )
 
 # Example hyperparameters ranges for Weibull CDF adstock
@@ -354,8 +342,8 @@ AllocatorCollect <- robyn_allocator(
   , OutputCollect = OutputCollect
   , select_model = select_model
   , scenario = "max_historical_response"
-  , channel_constr_low = c(0.7, 0.7, 0.7, 0.7, 0.7)
-  , channel_constr_up = c(1.2, 1.5, 1.5, 1.5, 1.5)
+  , channel_constr_low = c(0.7, 0.7, 0.7)
+  , channel_constr_up = c(1.2, 1.5, 1.5)
 )
 print(AllocatorCollect)
 AllocatorCollect$dt_optimOut
@@ -368,8 +356,8 @@ AllocatorCollect <- robyn_allocator(
   , OutputCollect = OutputCollect
   , select_model = select_model
   , scenario = "max_response_expected_spend"
-  , channel_constr_low = c(0.7, 0.7, 0.7, 0.7, 0.7)
-  , channel_constr_up = c(1.2, 1.5, 1.5, 1.5, 1.5)
+  , channel_constr_low = c(0.7, 0.7, 0.7)
+  , channel_constr_up = c(1.2, 1.5, 1.5)
   , expected_spend = 1000000 # Total spend to be simulated
   , expected_spend_days = 7 # Duration of expected_spend in days
 )
@@ -432,8 +420,8 @@ AllocatorCollect <- robyn_allocator(
   robyn_object = robyn_object
   #, select_build = 1 # Use third refresh model
   , scenario = "max_response_expected_spend"
-  , channel_constr_low = c(0.7, 0.7, 0.7, 0.7, 0.7)
-  , channel_constr_up = c(1.2, 1.5, 1.5, 1.5, 1.5)
+  , channel_constr_low = c(0.7, 0.7, 0.7)
+  , channel_constr_up = c(1.2, 1.5, 1.5)
   , expected_spend = 2000000 # Total spend to be simulated
   , expected_spend_days = 14 # Duration of expected_spend in days
 )
@@ -461,7 +449,7 @@ Spend1 <- 60000
 Response1 <- robyn_response(
   robyn_object = robyn_object
   #, select_build = 1 # 2 means the second refresh model. 0 means the initial model
-  , media_metric = "search_S"
+  , media_metric = "google_search_s"
   , metric_value = Spend1)
 Response1$response/Spend1 # ROI for search 80k
 Response1$plot
@@ -471,7 +459,7 @@ Spend2 <- Spend1 + 1000
 Response2 <- robyn_response(
   robyn_object = robyn_object
   #, select_build = 1
-  , media_metric = "search_S"
+  , media_metric = "google_search_s"
   , metric_value = Spend2)
 Response2$response/Spend2 # ROI for search 81k
 Response2$plot
@@ -484,20 +472,20 @@ imps <- 5000000
 response_imps <- robyn_response(
   robyn_object = robyn_object
   #, select_build = 1
-  , media_metric = "facebook_I"
+  , media_metric = "paid_facebook_l"
   , metric_value = imps)
 response_imps$response / imps * 1000
 response_imps$plot
 
 ## Example of getting organic media exposure response curves
-sendings <- 30000
-response_sending <- robyn_response(
-  robyn_object = robyn_object
+##sendings <- 30000
+#response_sending <- robyn_response(
+#  robyn_object = robyn_object
   #, select_build = 1
-  , media_metric = "newsletter"
-  , metric_value = sendings)
-response_sending$response / sendings * 1000
-response_sending$plot
+#  , media_metric = "newsletter"
+#  , metric_value = sendings)
+#response_sending$response / sendings * 1000
+#response_sending$plot
 
 ################################################################
 #### Optional: get old model results
