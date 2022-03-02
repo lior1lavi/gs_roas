@@ -55,8 +55,9 @@ options(future.fork.enable = TRUE)
 #### Step 1: load data
 
 ## Check simulated dataset or load your own dataset
-data("dt_simulated_weekly")
-head(dt_simulated_weekly)
+mydata <- read.csv("hs_roas_data.csv")
+hs_roas_data <- data.frame(mydata)
+head(hs_roas_data)
 
 ## Check holidays from Prophet
 # 59 countries included. If your country is not included, please manually add it.
@@ -78,23 +79,23 @@ robyn_object <- "~/Desktop/MyRobyn.RDS"
 ## is available in ?robyn_inputs
 ## ------------------------------------------------------------------------------------------ ##
 InputCollect <- robyn_inputs(
-  dt_input = dt_simulated_weekly
-  ,dt_holidays = dt_prophet_holidays
-  ,date_var = "date" # date format must be "2020-01-01"
-  ,dep_var = "revenue" # there should be only one dependent variable
-  ,dep_var_type = "revenue" # "revenue" or "conversion"
-  ,prophet_vars = c("trend", "season", "holiday") # "trend","season", "weekday" & "holiday"
-  ,prophet_country = "DE"# input one country. dt_prophet_holidays includes 59 countries by default
+  dt_input = hs_roas_data,
+  dt_holidays = dt_prophet_holidays,
+  date_var = "date", # date format must be "2020-01-01"
+  dep_var = "revenue", # there should be only one dependent variable
+  dep_var_type = "revenue", # "revenue" or "conversion"
+  prophet_vars = c("trend", "season", "holiday"), # "trend","season", "weekday" & "holiday"
+  prophet_country = "DE",# input one country. dt_prophet_holidays includes 59 countries by default
   #,context_vars = c("competitor_sales_B", "events") # e.g. competitors, discount, unemployment etc
-  ,paid_media_spends = c("google_search_s","paid_facebook_s",	"paid_instagram_s") # mandatory input
-  ,paid_media_vars = c("google_search_l", "paid_facebook_l"	,	"paid_instagram_l") # mandatory.
+  paid_media_spends = c("google_search_s","paid_facebook_s",	"paid_instagram_s"), # mandatory input
+  paid_media_vars =   c("google_search_l","paid_facebook_l",	"paid_instagram_l"), # mandatory.
   # paid_media_vars must have same order as paid_media_spends. Use media exposure metrics like
   # impressions, GRP etc. If not applicable, use spend instead.
   #,organic_vars = c("newsletter") # marketing activity without media spend
- # ,factor_vars = c("events") # specify which variables in context_vars or organic_vars are factorial
-  ,window_start = "2021-01-01"
-  ,window_end = "2022-02-28"
-  ,adstock = "geometric" # geometric, weibull_cdf or weibull_pdf.
+  # ,factor_vars = c("events") # specify which variables in context_vars or organic_vars are factorial
+  window_start = "2021-01-01",
+  window_end = "2022-02-28",
+  adstock = "geometric" # geometric, weibull_cdf or weibull_pdf.
 )
 print(InputCollect)
 # ?robyn_inputs for more info
